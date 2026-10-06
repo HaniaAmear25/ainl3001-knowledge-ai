@@ -589,8 +589,11 @@ Complete these after finishing the main tasks.
 4. What is a plateau?
 5. How does Simulated Annealing attempt to overcome the limitations of Hill Climbing?
 6. What is the difference between deterministic and stochastic search?
+A deterministic algorithm makes decisions according to fixed rules, so the same situation leads to the same choice. A stochastic algorithm uses randomness, so its behaviour can vary between runs.
 7. How did the `Problem` representation allow us to represent both a grid world and N-Queens?
+Both problems use the same general ideas of states, actions and results, even though the actual problems are different.
 8. How do optimisation techniques such as these relate to Machine Learning?
+Machine Learning also involves optimisation. During training, a model tries to find parameters that minimise an error or loss function.
 
 
 # Extensions
