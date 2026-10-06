@@ -202,37 +202,35 @@ def simulated_annealing(problem, start_board):
     temperature = 10.0
     cooling_rate = 0.95
 
-    
+    while temperature > 0.01:
 
-        while temperature > 0.01:
+        neighbours = generate_neighbours(problem, current)
 
-            neighbours = generate_neighbours(problem, current)
+        next_board = random.choice(neighbours)
 
-            next_board = random.choice(neighbours)
+        current_conflicts = count_conflicts(current)
+        next_conflicts = count_conflicts(next_board)
 
-            current_conflicts = count_conflicts(current)
-            next_conflicts = count_conflicts(next_board)
+        # If the new board is better, accept it
+        if next_conflicts < current_conflicts:
+            current = next_board
 
-            # If the new board is better, accept it
-            if next_conflicts < current_conflicts:
+        # Otherwise, sometimes accept it anyway
+        else:
+            difference = next_conflicts - current_conflicts
+            probability = math.exp(-difference / temperature)
+
+            if random.random() < probability:
                 current = next_board
 
-            # Otherwise, sometimes accept it anyway
-            else:
-                difference = next_conflicts - current_conflicts
-                probability = math.exp(-difference / temperature)
+        # Stop if solved
+        if count_conflicts(current) == 0:
+            return current
 
-                if random.random() < probability:
-                    current = next_board
+        # Reduce the temperature
+        temperature *= cooling_rate
 
-            # Stop if solved
-            if count_conflicts(current) == 0:
-                return current
-
-            # Reduce the temperature
-            temperature *= cooling_rate
-
-        return current
+    return current
 
 # --------------------------------------------------
 # TESTING AREA
@@ -292,4 +290,40 @@ if __name__ == "__main__":
 
     print("Final conflicts:")
     print(count_conflicts(solution))
+
+    print("\nSimulated Annealing")
+
+    sa_solution = simulated_annealing(
+        problem,
+        board
+    )
+
+    print("Final board:")
+    print(sa_solution)
+
+    print("Start conflicts:")
+    print(count_conflicts(board))
+
+    print("Final conflicts:")
+    print(count_conflicts(sa_solution))
+
+
+
+    #EXP RESULTS
+
+    #RUN1
+    #HILL: 0 OCNFLICTS
+    #SIMULATED ANNEALING : 2
+
+    #RUN2
+    #HILL:1
+    #SA: 1
+
+    #RUN3:
+    #HILL : 2
+    #SA: 2
+
+    #RUN4
+    #HILL: 2
+    #SA: 1
 
