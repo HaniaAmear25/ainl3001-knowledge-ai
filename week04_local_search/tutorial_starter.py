@@ -169,21 +169,30 @@ print(
 Be ready to discuss:
 
 1. What information is stored in problem.initial?
+the starting state which is (0,0)
 
 2. What information is stored in problem.goal?
+the target state which is (4,4)
 
 3. What is the difference between:
 
        problem.actions(state)
+       tells us what actions are possible 
 
    and:
 
        problem.result(state, action)
+       tells us the new state after making a move
+
+
 
 4. Why doesn't Problem know anything about grids?
 
 5. Why doesn't GridProblem know anything about search?
 
+describes the grid problem, but doesn't contain a search algorithm.
+
 6. Could the same Problem structure be used for something
    other than a grid?
+   yes can be used for any problem that can be represented as a state space with actions and results
 """

@@ -83,7 +83,23 @@ def count_conflicts(board):
     #   1. in the same row
     #   2. on the same diagonal
 
-    pass
+    conflicts = 0
+
+    for col1 in range(len(board)):
+        for col2 in range(col1 + 1, len(board)):
+
+            row1 = board[col1]
+            row2 = board[col2]
+
+            # Same row
+            if row1 == row2:
+                conflicts += 1
+
+            # Same diagonal
+            elif abs(row1 - row2) == abs(col1 - col2):
+                conflicts += 1
+
+    return conflicts
 
 
 # --------------------------------------------------
@@ -107,7 +123,11 @@ def generate_neighbours(problem, board):
     # 1. Ask the problem for the available actions.
     # 2. Apply each action.
     # 3. Add the resulting state to neighbours.
+    actions = problem.actions(board)
 
+    for action in actions:
+        new_board = problem.result(board, action)
+        neighbours.append(new_board)
     return neighbours
 
 
@@ -142,9 +162,24 @@ def hill_climbing(problem, start_board):
 
     current = start_board
 
-    # TODO
+    while True:
 
-    pass
+        neighbours = generate_neighbours(problem, current)
+
+        best_neighbour = min(
+            neighbours,
+            key=count_conflicts
+        )
+
+        current_conflicts = count_conflicts(current)
+        best_conflicts = count_conflicts(best_neighbour)
+
+        if best_conflicts >= current_conflicts:
+            return current
+
+        current = best_neighbour
+
+   
 
 
 # --------------------------------------------------
@@ -167,10 +202,37 @@ def simulated_annealing(problem, start_board):
     temperature = 10.0
     cooling_rate = 0.95
 
-    # TODO
+    
 
-    pass
+        while temperature > 0.01:
 
+            neighbours = generate_neighbours(problem, current)
+
+            next_board = random.choice(neighbours)
+
+            current_conflicts = count_conflicts(current)
+            next_conflicts = count_conflicts(next_board)
+
+            # If the new board is better, accept it
+            if next_conflicts < current_conflicts:
+                current = next_board
+
+            # Otherwise, sometimes accept it anyway
+            else:
+                difference = next_conflicts - current_conflicts
+                probability = math.exp(-difference / temperature)
+
+                if random.random() < probability:
+                    current = next_board
+
+            # Stop if solved
+            if count_conflicts(current) == 0:
+                return current
+
+            # Reduce the temperature
+            temperature *= cooling_rate
+
+        return current
 
 # --------------------------------------------------
 # TESTING AREA
@@ -211,3 +273,23 @@ if __name__ == "__main__":
     print(
         f"{len(neighbours)} neighbours generated"
     )
+
+    print("\nHill Climbing")
+
+    solution = hill_climbing(
+        problem,
+        board
+    )
+
+    print("Start board:")
+    print(board)
+
+    print("Start conflicts:")
+    print(count_conflicts(board))
+
+    print("Final board:")
+    print(solution)
+
+    print("Final conflicts:")
+    print(count_conflicts(solution))
+
