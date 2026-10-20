@@ -34,9 +34,13 @@ print("Manual CSP Exploration")
 print(example_assignment)
 print("\nQuestions:")
 print("1. Is this assignment valid?")
+print("No, some neighbouring regions have same colour")
 print("2. Which neighbouring pairs violate a constraint?")
+print(" WA/NT are both Red; SA/V are both Green.")
 print("3. How could you correct the assignment?")
+print(" changing the colour of the neighbour so no two have the same colour")
 print("4. Why is it useful to detect violations early?")
+
 
 # --------------------------------------------------
 # TASK 1 — CSP REPRESENTATION
@@ -70,12 +74,12 @@ constraints = [
 
 def is_valid_assignment(assignment):
     """Return True if a complete OR partial assignment is valid."""
-    # TODO:
-    # 1. Loop over neighbouring pairs in constraints.
-    # 2. If BOTH regions have been assigned, compare their colours.
-    # 3. Return False if neighbouring regions have the same colour.
-    # 4. Otherwise return True.
-    pass
+    for r1,r2 in constraints:
+        if r1 in assignment and r2 in assignment:
+            if assignment[r1] == assignment[r2]:
+                return False
+    return True
+
 
 
 # --------------------------------------------------
@@ -91,15 +95,31 @@ def select_unassigned_variable(assignment):
     choose the unassigned region with the FEWEST currently legal
     colours. Break ties by keeping the first region in variables.
     """
-    # TASK 3 TODO:
-    # Return the first variable not in assignment, or None if all
-    # variables have been assigned.
-    #
-    # TASK 5 TODO (after backtracking works):
-    # For each unassigned variable, temporarily try each colour,
-    # check is_valid_assignment(), and undo the temporary assignment.
-    # Count legal colours and choose the variable with the fewest.
-    pass
+    best_var = None
+    min_colours = float("inf")
+
+    for variable in variables:
+        if variable not in assignment:
+
+            legal_colours = 0
+
+            for colour in domains[variable]:
+                assignment[variable] = colour
+
+                if is_valid_assignment(assignment):
+                    legal_colours += 1
+
+                del assignment[variable]
+
+            if legal_colours < min_colours:
+                min_colours = legal_colours
+                best_var = variable
+
+    return best_var
+
+    
+    
+    
 
 
 # --------------------------------------------------
@@ -108,15 +128,24 @@ def select_unassigned_variable(assignment):
 
 def backtracking_search(assignment):
     """Return a complete valid assignment, or None if none exists."""
-    # TODO:
-    # 1. If every variable has been assigned, return a COPY.
-    # 2. Choose a variable with select_unassigned_variable().
-    # 3. For each colour in its domain, temporarily assign it.
-    # 4. If the partial assignment is valid, search recursively.
-    # 5. Return the recursive result if a solution was found.
-    # 6. Otherwise remove the temporary assignment (backtrack).
-    # 7. Return None if every colour fails.
-    pass
+    if len(assignment) == len(variables):
+        return assignment.copy()
+
+    variable = select_unassigned_variable(assignment)
+
+    for colour in domains[variable]:
+        assignment[variable] = colour
+
+        if is_valid_assignment(assignment):
+            result = backtracking_search(assignment)
+
+            if result is not None:
+                return result
+
+        del assignment[variable]
+
+    return None
+    
 
 
 # --------------------------------------------------
@@ -125,6 +154,10 @@ def backtracking_search(assignment):
 
 # Six regions with three possible colours each give 3 ** 6 = 729
 # complete assignments. Why can backtracking avoid checking all 729?
+# Beacsue backtracking rejects invalid assignments early. it avoids exploring 
+# branches taht already violate the constaints
+# if it detects a violation it rejects that choice and removes
+# the temp assignment and tries diff colour
 
 
 # --------------------------------------------------
